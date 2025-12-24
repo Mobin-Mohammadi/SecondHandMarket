@@ -1,0 +1,183 @@
+﻿@model IEnumerable<ISE309_SecondHandMarket.Models.Product>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@* --- Header --- *@
+<div class="text-center my-5">
+    <h1 class="display-4 fw-bold text-primary">Second-Hand Market</h1>
+    <p class="lead text-secondary">Discover great deals or list your items for sale today!</p>
+</div>
+
+@* --- Modern Pill Category Navigation --- *@
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center">
+            <nav class="nav nav-pills bg-white p-2 rounded-pill shadow-sm border">
+                <a href="/" class="nav-link rounded-pill px-4 me-2 @(ViewBag.SelectedCategory == null ? "active bg-primary text-white" : "text-dark hover-gray")">
+                    <i class="bi bi-house-door-fill me-1"></i> All Items
+                </a>
+
+                @if (ViewBag.Categories != null)
+                {
+                    foreach (var category in ViewBag.Categories)
+                    {
+                        <a asp-action="Index" asp-route-categoryId="@category.Id"
+                           class="nav-link rounded-pill px-4 me-1 @(ViewBag.SelectedCategory == category.Id ? "active bg-primary text-white" : "text-dark hover-gray")">
+                            @category.Name
+                        </a>
+                    }
+                }
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 transition-hover">
+                        @* --- Product Image --- *@
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 220px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                <span class="ms-2 text-muted">No Image</span>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0 text-dark fw-bold">@item.Title</h5>
+                                <span class="badge rounded-pill bg-light text-primary border border-primary">@item.Category?.Name</span>
+                            </div>
+
+                            @* --- FIXED: Truncated Description with Read More --- *@
+                            <p class="card-text text-muted small" style="height: 3.5rem; overflow: hidden;">
+                                @if (!string.IsNullOrEmpty(item.Description) && item.Description.Length > 85)
+                                {
+                                    @item.Description.Substring(0, 85)
+                        
+                                    <span>...</span>
+                                    <a href="javascript:void(0);" class="text-primary fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#descModal-@item.Id">
+                                        Read More
+                                    </a>
+                                }
+                                else
+                                {
+                                    @item.Description
+                                }
+                            </p>
+
+                            <div class="mt-3">
+                                <span class="h4 mb-0 text-success fw-bold">@item.Price.ToString("C")</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0 pb-3">
+                            <div class="d-grid mb-2">
+                                @if (!string.IsNullOrEmpty(item.ContactInfo) && item.ContactInfo.Contains("@"))
+                                {
+                                    <a href="mailto:@item.ContactInfo?subject=Inquiry about @item.Title" class="btn btn-primary shadow-sm">
+                                        <i class="bi bi-envelope-fill me-2"></i>Email Seller
+                                    </a>
+                                }
+                                else if (!string.IsNullOrEmpty(item.ContactInfo))
+                                {
+                                    <a href="tel:@item.ContactInfo" class="btn btn-dark shadow-sm">
+                                        <i class="bi bi-telephone-fill me-2"></i>Call Seller
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary disabled">No Contact Info</button>
+                                }
+                            </div>
+                            <div class="text-center">
+                                <small class="text-muted"><i class="bi bi-person-circle me-1"></i> @item.ContactInfo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- ADDED: Modal Popup for Full Description --- *@
+                <div class="modal fade" id="descModal-@item.Id" tabindex="-1" aria-labelledby="modalLabel-@item.Id" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="modalLabel-@item.Id">@item.Title</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <h6 class="text-muted mb-2">Description:</h6>
+                                <p class="text-dark" style="white-space: pre-wrap; line-height: 1.6;">@item.Description</p>
+                            </div>
+                            <div class="modal-footer border-top-0">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded shadow-sm border">
+                    <i class="bi bi-search display-1 text-muted mb-3 d-block"></i>
+                    <h3 class="fw-bold">No items found</h3>
+                    <p class="text-secondary">Try selecting a different category or listing your own item!</p>
+                    <a asp-controller="Product" asp-action="Create" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-lg me-1"></i> Start Selling
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .transition-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .transition-hover:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important;
+        }
+
+        .hover-gray:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd !important;
+        }
+
+        .nav-pills .nav-link {
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .card-img-top {
+            border-top-left-radius: calc(0.5rem - 1px);
+            border-top-right-radius: calc(0.5rem - 1px);
+        }
+
+        footer {
+            font-size: 0.85rem;
+            letter-spacing: 0.02rem;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.6);
+        }
+    </style>
+}

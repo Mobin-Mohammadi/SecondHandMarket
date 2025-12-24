@@ -1,0 +1,90 @@
+﻿@model ISE309_SecondHandMarket.Models.Product
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="card-header bg-dark text-white py-3 text-center">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Product</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ImageUrl" />
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Title" class="form-control" placeholder="Product Title" />
+                            <label asp-for="Title"></label>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Price" class="form-control" placeholder="0.00" />
+                                    <label asp-for="Price"></label>
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
+                                    <label asp-for="CategoryId">Category</label>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 text-center">
+                            <label class="form-label d-block fw-bold text-secondary small text-start">Current Image</label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" class="rounded border shadow-sm mb-2" style="max-height: 150px; width: auto;" />
+                            }
+                            else
+                            {
+                                <div class="p-3 bg-light border rounded text-muted mb-2">No image uploaded</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small">Replace Image (Optional)</label>
+                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Description" class="form-control" style="height: 100px" placeholder="Description"></textarea>
+                            <label asp-for="Description"></label>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ContactInfo" class="form-control" placeholder="Phone or Email" />
+                            <label asp-for="ContactInfo">Contact Info</label>
+                            <span asp-validation-for="ContactInfo" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-dark btn-lg shadow-sm">Update Product</button>
+                            <a asp-action="Index" class="btn btn-link text-muted text-decoration-none text-center">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
